@@ -1,20 +1,22 @@
 import User from "../models/user.model.js";
+import generateTokenAndSetCookie from "../utils/generateToken.js";
 
 
 export  const signupUser = async(req,res)=>{
     try{
-        const {fullName, username, password, confirmPassword, gender}
-        = req.body;
-        if(password!== confirmPassword){
-            return res.status(400).json({msg:"Passwords do not match"})
+        const { fullName, username, password, confirmPassword, gender } = req.body;
+
+		if (password !== confirmPassword) {
+			return res.status(400).json({ error: "Passwords don't match" });
+		}
+
+		const user = await User.findOne({ username });
+
+		if (user) {
+			return res.status(400).json({ error: "Username already exists" });
+
         }
-        const  user = await User.findOne({username});
-        if(user){
-            return res.status(400).json({msg: 'Username already exists'})
-        };
-
-
-        //HASH PASSWORD
+        //HASH PASSWORDj
 
         //avatars
         const boyProfilePics =` https://avatar.iran.liara.run/public/boy?username=${username}`
@@ -26,10 +28,12 @@ export  const signupUser = async(req,res)=>{
             username,
             password,
             gender,
-            profilePicture :gender === "male"? boyProfilePics: girlProfilePics ,
+            profilePicture :gender === "Male"? boyProfilePics: girlProfilePics ,
         })
 
-        await  newUser.save();
+        if(newUser){
+            generateTokenAndSetCookie(newUser._id, res)
+            await  newUser.save();
 
         res.status(201)
         .json({
@@ -37,15 +41,31 @@ export  const signupUser = async(req,res)=>{
             fullName: newUser.fullName,
             username: newUser.username,
             profilePicture: newUser.profilePicture
-    })
+        })
+    }else{
+        res.status(400).json({error:"Invalid user data"})
+    }
+        
    
     }catch(error){
-    console.log("signupUser")
+    console.log("THE ERROR IS ", error)
     res.send("signup")
     }
 }
 
-export  const loginUser  =  (req,res)=>{
+export  const loginUser  = async (req,res)=>{
+    try {
+        const{username,password}= req.body;
+       let user=await User.findOne({username});
+     
+       if(!user){
+           return res.status(400).json({error:'The user deos not exist'})
+        }
+    } catch (error) {
+        console.log("THE ERROR IS ", error)
+        res.send("login")
+        
+    }
     console.log("loginUser")
 }
 
