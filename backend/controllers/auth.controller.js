@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from "../models/user.model.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
-
 export  const signupUser = async(req,res)=>{
     try{
         const { fullName, username, password, confirmPassword, gender } = req.body;
@@ -86,7 +85,7 @@ export  const loginUser  = async (req,res)=>{
 
 export  const logoutUser  =  async (req,res)=>{
     try{
-        res.cookie("Jwt", "", {maxAge:0})
+        res.cookie("jwt", "", {maxAge:0})
         res.status(200).json({message: "Logged out successfully"})
     }catch(error){
         console.log("Error in logging out")

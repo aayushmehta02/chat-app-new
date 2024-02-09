@@ -3,26 +3,26 @@ import Message from "../models/message.model.js"
 export const sendMessage = async(req,res)=>{
     try {
         const {message} = req.body
-        const {id: recieverId} = req.param
+        const {id: receiverId } = req.param
         const senderId = req.user._id
 
         let conversation = await Conversation.findOne({
             participants:{
-                $all:[senderId, recieverId]
+                $all:[senderId, receiverId ]
             }
         })
 
 
         if(!conversation){
                 conversation = await Conversation.create({
-                    participants: [senderId, recieverId]
+                    participants: [senderId, receiverId ]
             })
         }
 
         const newMessage = new Message({
             message, 
             senderId,
-            recieverId
+            receiverId 
 
         })
 
@@ -30,11 +30,36 @@ export const sendMessage = async(req,res)=>{
         if(newMessage){
             conversation.messages.push(newMessage._id)
         }
+        await conversation.save();
+        await newMessage.save();
 
 
         res.status(201).json(newMessage)
     } catch (error) {
-        console.log(error);
-        res.status(500).json({error: error})
+        console.log("Error in sending a message", error);
+        res.status(500).json({error: "the error is: ", error})
     }
+}
+
+export const getMessage  = async(req,res)=>{
+        
+        
+
+    try {
+		const { id: userToChatId } = req.params;
+		const senderId = req.user._id;
+
+		const conversation = await Conversation.findOne({
+			participants: { $all: [senderId, userToChatId] },
+		}).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
+
+		if (!conversation) return res.status(200).json([]);
+
+		const messages = conversation.messages;
+
+		res.status(200).json(messages);
+	} catch (error) {
+		console.log("Error in getMessages controller: ", error.message);
+		res.status(500).json({ error: "Internal server error" });
+	}
 }
