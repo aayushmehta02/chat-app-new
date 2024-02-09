@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 
+import bcrypt from 'bcryptjs';
 
 export  const signupUser = async(req,res)=>{
     try{
@@ -17,7 +18,8 @@ export  const signupUser = async(req,res)=>{
 
         }
         //HASH PASSWORDj
-
+        const salt = await bcrypt.genSalt(10)
+        const  hashedPassword=await bcrypt.hash(password, salt);
         //avatars
         const boyProfilePics =` https://avatar.iran.liara.run/public/boy?username=${username}`
         const girlProfilePics =` https://avatar.iran.liara.run/public/girl?username=${username}`
@@ -26,7 +28,7 @@ export  const signupUser = async(req,res)=>{
         const newUser = new User({
             fullName,
             username,
-            password,
+            password: hashedPassword,
             gender,
             profilePicture :gender === "Male"? boyProfilePics: girlProfilePics ,
         })
@@ -54,12 +56,25 @@ export  const signupUser = async(req,res)=>{
 }
 
 export  const loginUser  = async (req,res)=>{
+    
+
     try {
+        
         const{username,password}= req.body;
-       let user=await User.findOne({username});
+       const user=await User.findOne({username});
+       const isPassword = await bcrypt.compare(password, user?.password || "")
      
-       if(!user){
+       if(!user || !isPassword){
            return res.status(400).json({error:'The user deos not exist'})
+        }else{
+            generateTokenAndSetCookie(user._id, res);
+            return res.status(200).json({
+                id: user._id,
+            fullName: user.fullName,
+            username: user.username,
+            profilePicture: user.profilePicture
+
+            })
         }
     } catch (error) {
         console.log("THE ERROR IS ", error)
@@ -69,6 +84,12 @@ export  const loginUser  = async (req,res)=>{
     console.log("loginUser")
 }
 
-export  const logoutUser  = (req,res)=>{
-    console.log("logoutUser")
+export  const logoutUser  =  async (req,res)=>{
+    try{
+        res.cookie("Jwt", "", {maxAge:0})
+        res.status(200).json({message: "Logged out successfully"})
+    }catch(error){
+        console.log("Error in logging out")
+        res.status(500).json({error: "internal server error"})
+    }
 }
