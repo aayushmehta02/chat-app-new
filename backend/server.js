@@ -1,7 +1,6 @@
 //package imports
 import dotenv from "dotenv";
 import express from "express";
-
 //file imports
 import connectToMongoDB from "./db/connectToMongoDB.js";
 import authRoutes from "./routes/auth.routes.js";

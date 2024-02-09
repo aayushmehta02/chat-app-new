@@ -1,3 +1,40 @@
+import Conversation from "../models/conversation.model.js"
+import Message from "../models/message.model.js"
 export const sendMessage = async(req,res)=>{
-    console.log("Message sent")
+    try {
+        const {message} = req.body
+        const {id: recieverId} = req.param
+        const senderId = req.user._id
+
+        let conversation = await Conversation.findOne({
+            participants:{
+                $all:[senderId, recieverId]
+            }
+        })
+
+
+        if(!conversation){
+                conversation = await Conversation.create({
+                    participants: [senderId, recieverId]
+            })
+        }
+
+        const newMessage = new Message({
+            message, 
+            senderId,
+            recieverId
+
+        })
+
+
+        if(newMessage){
+            conversation.messages.push(newMessage._id)
+        }
+
+
+        res.status(201).json(newMessage)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: error})
+    }
 }
