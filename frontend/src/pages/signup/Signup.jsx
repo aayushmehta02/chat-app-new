@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useSignup from '../../hooks/UseSignup';
 import GenderCheckbox from './GenderCheckbox';
-
 export const Signup = () => {
     const [inputs, setInputs] = useState({
         fullName: '',
@@ -10,76 +10,87 @@ export const Signup = () => {
         confirmPassword: '',
         gender: ''
     })
+    const {loading, signup} = useSignup()
 
+    
     const handleGender = (gender)=>{
         setInputs ({...inputs,  gender})
     }
 
-    const handleSubmit=(e)=>{
+    const handleSubmit= async(e)=>{
         e.preventDefault()
-        console.log(inputs)
+        await signup(inputs)
     }
   return (
-    <div className='flex flex-col items-center justify-center min-w-96 mx-auto'>
-			<div className='w-full p-6 rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0'>
- 				<h1 className='text-3xl font-semibold text-center text-gray-300'>
- 					Sign Up <span className='text-blue-500'> ChatApp</span>
- 				</h1>
- 				<form onSubmit={handleSubmit}>
- 					<div>
- 						<label className='label p-2'>
- 							<span className='text-base label-text'>Full Name</span>
- 						</label>
- 						<input type='text' placeholder='Full name' className='w-full input input-bordered  h-10' value={inputs.fullName} onChange={(e)=> setInputs({...inputs, fullName: e.target.value})} />
- 					</div>
-
- 					<div>
- 						<label className='label p-2 '>
- 							<span className='text-base label-text'>Username</span>
- 						</label>
- 						<input type='text' placeholder='name@email.com' className='w-full input input-bordered h-10'  value={inputs.email} onChange={(e)=>setInputs({...inputs, email: e.target.value})}/>
- 					</div>
-
- 					<div>
- 						<label className='label'>
- 							<span className='text-base label-text'>Password</span>
- 						</label>
- 						<input
-							type='password'
-							placeholder='*********'
-							className='w-full input input-bordered h-10'
-                            value={inputs.password} onChange={(e) => setInputs({...inputs, password: e.target.value})}
- 						/>
-					</div>
-
-					<div>
-						<label className='label'>
-							<span className='text-base label-text'>Confirm Password</span>
-						</label>
-						<input
-							type='password'
-							placeholder='Confirm Password'
-							className='w-full input input-bordered h-10'
-                            value={inputs.confirmPassword}
-                            onChange={(e) => setInputs({...inputs, confirmPassword: e.target.value})}
-						/>
-					</div>
-
-					<GenderCheckbox onCheckboxChange = {handleGender} selectedGender= {inputs.gender} />
-
-					<Link
-						to={"/login"}
-						className='text-sm hover:underline hover:text-blue-600 mt-2 inline-block'
-						
-					>
-						Already have an account?
-					</Link>
-
-					<div>
-						<button className='btn btn-block btn-sm mt-2 border border-slate-700'>Sign Up</button>
-					</div>
- 				</form>
- 			</div>
-		</div>
+    <div className="w-2/5 backdrop-blur-lg bg-opacity-80 rounded-lg shadow-lg p-5 bg-gray-900 text-white">
+  <h2 className="text-2xl font-bold pb-5">SignUp</h2>
+  <form  onSubmit={handleSubmit}>
+    <div className="mb-4">
+      <label  className="block mb-2 text-xl font-medium float-left">Full Name</label>
+      <input
+        type="text"
+        id="name"
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+        placeholder="Jack  Doe"
+        required
+        value={inputs.fullName} onChange={(e)=> setInputs({...inputs, fullName: e.target.value})}
+        />
+    </div>
+    <div className="mb-4">
+      <label className="block mb-2 text-xl font-medium float-left"> Email</label>
+      <input
+        type="email"
+        id="email"
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+        placeholder="jack@mail.com"
+        required
+        value={inputs.email} onChange={(e)=>setInputs({...inputs, email: e.target.value})}
+      />
+    </div>
+    <div className="mb-4">
+      <label className="block mb-2 text-xl font-medium float-left">Password</label>
+      <input
+        type="password"
+        id="password"
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+        placeholder="*********"
+        required
+        value={inputs.password} onChange={(e) => setInputs({...inputs, password: e.target.value})}
+      />
+    </div>
+    <div className="mb-4">
+      <label  className="block mb-2 text-xl font-medium float-left">Confirm password</label>
+      <input
+        type="password"
+        id="password"
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
+        placeholder="*********"
+        required
+        value={inputs.confirmPassword}
+        onChange={(e) => setInputs({...inputs, confirmPassword: e.target.value})}
+      />
+    </div>
+    
+    <GenderCheckbox onCheckboxChange={handleGender} selectedGender={inputs.gender} />
+    <div>
+      <p className="text-red-500 pb-5"></p>
+    </div>
+    <div className="flex flex-col items-center justify-between mb-4">
+      <button
+        type="submit"
+        className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-xl py-2.5 px-5 w-5/6 mb-4 "
+      disabled={loading}>
+        {loading ? <span className='loading loading-spinner'></span> : "Sign Up"}
+      </button>
+      <div className="flex items-center text-sm">
+      <Link to={'/login'}>
+      <p>Already have an account?</p>
+        <p className="underline cursor-pointer ml-1">Sign in</p>
+      </Link>
+        
+      </div>
+    </div>
+  </form>
+</div>
   )
 }
