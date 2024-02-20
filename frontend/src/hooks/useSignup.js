@@ -16,18 +16,16 @@ const useSignup = () => {
             method: "POST",
             headers:  {"Content-Type": "application/json"},
             body: JSON.stringify({fullName, email, password, confirmPassword, gender})
-        }
-
-        )
+        })
 
         if(!res.ok){ throw new Error('Server error')}
 
         const data = await res.json()
         console.log(data);  
     } catch (error) {
-        toast.error("Try error: ",error.message);
+        toast.error(error.message);
         console.log(error.message)
-        return
+        return false;
 
     }finally{
         setLoading(false)

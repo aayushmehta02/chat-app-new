@@ -2,7 +2,9 @@ import bcrypt from 'bcryptjs';
 import User from "../models/user.model.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 export  const signupUser = async(req,res)=>{
+   
     try{
+        console.log("request sent")
         const { fullName, username, password, confirmPassword, gender } = req.body;
 
 		if (password !== confirmPassword) {
@@ -46,11 +48,13 @@ export  const signupUser = async(req,res)=>{
     }else{
         res.status(400).json({error:"Invalid user data"})
     }
+
         
    
     }catch(error){
     console.log("THE ERROR IS ", error)
     res.send("signup")
+
     }
 }
 

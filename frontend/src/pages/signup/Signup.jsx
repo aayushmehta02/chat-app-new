@@ -5,7 +5,7 @@ import GenderCheckbox from './GenderCheckbox';
 export const Signup = () => {
     const [inputs, setInputs] = useState({
         fullName: '',
-        email: '' ,
+        username: '' ,
         password: '',
         confirmPassword: '',
         gender: ''
@@ -37,14 +37,14 @@ export const Signup = () => {
         />
     </div>
     <div className="mb-4">
-      <label className="block mb-2 text-xl font-medium float-left"> Email</label>
+      <label className="block mb-2 text-xl font-medium float-left"> username</label>
       <input
-        type="email"
-        id="email"
+        type="username"
+        id="username"
         className="bg-gray-100 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full py-2.5 px-4"
         placeholder="jack@mail.com"
         required
-        value={inputs.email} onChange={(e)=>setInputs({...inputs, email: e.target.value})}
+        value={inputs.username} onChange={(e)=>setInputs({...inputs, username: e.target.value})}
       />
     </div>
     <div className="mb-4">
